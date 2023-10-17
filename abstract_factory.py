@@ -2,6 +2,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 
 
+#Creamos la factoría que cree productos
 class AbstractFactory(ABC):
     """
     The Abstract Factory interface declares a set of methods that return
@@ -11,6 +12,8 @@ class AbstractFactory(ABC):
     variants, but the products of one variant are incompatible with products of
     another.
     """
+
+    #El decorador abstract method para que otras tareas en paralelo no accedan a la memoria de esta función
     @abstractmethod
     def create_product_a(self) -> AbstractProductA:
         pass
@@ -18,6 +21,11 @@ class AbstractFactory(ABC):
     @abstractmethod
     def create_product_b(self) -> AbstractProductB:
         pass
+
+    @abstractmethod
+    def create_porduct_c(self) -> AbstractProductC:
+        pass
+
 
 
 class ConcreteFactory1(AbstractFactory):
@@ -33,6 +41,9 @@ class ConcreteFactory1(AbstractFactory):
 
     def create_product_b(self) -> AbstractProductB:
         return ConcreteProductB1()
+    
+    def create_porduct_c(self) -> AbstractProductC:
+        return ConcreteProductC1()
 
 
 class ConcreteFactory2(AbstractFactory):
@@ -45,6 +56,9 @@ class ConcreteFactory2(AbstractFactory):
 
     def create_product_b(self) -> AbstractProductB:
         return ConcreteProductB2()
+
+    def create_porduct_c(self) -> AbstractProductC:
+        return ConcreteProductC2()
 
 
 class AbstractProductA(ABC):
@@ -129,6 +143,64 @@ class ConcreteProductB2(AbstractProductB):
         """
         result = collaborator.useful_function_a()
         return f"The result of the B2 collaborating with the ({result})"
+    
+
+class AbstractProductC(ABC):
+    """
+    Here's the the base interface of another product. All products can interact
+    with each other, but proper interaction is possible only between products of
+    the same concrete variant.
+    """
+    @abstractmethod
+    def useful_function_c(self) -> None:
+        """
+        Product C is able to do its own thing...
+        """
+        pass
+
+    @abstractmethod
+    def another_useful_function_c(self, collaborator: AbstractProductA) -> None:
+        """
+        ...but it also can collaborate with the ProductA.
+
+        The Abstract Factory makes sure that all products it creates are of the
+        same variant and thus, compatible.
+        """
+        pass
+
+
+"""
+Concrete Products are created by corresponding Concrete Factories.
+"""
+
+
+class ConcreteProductC1(AbstractProductC):
+    def useful_function_c(self) -> str:
+        return "The result of the product C1."
+
+    """
+    The variant, Product C1, is only able to work correctly with the variant,
+    Product A1. Nevertheless, it accepts any instance of AbstractProductA as an
+    argument.
+    """
+
+    def another_useful_function_c(self, collaborator: AbstractProductA) -> str:
+        result = collaborator.useful_function_a()
+        return f"The result of the C1 collaborating with the ({result})"
+
+
+class ConcreteProductC2(AbstractProductC):
+    def useful_function_c(self) -> str:
+        return "The result of the product C2."
+
+    def another_useful_function_c(self, collaborator: AbstractProductA):
+        """
+        The variant, Product C2, is only able to work correctly with the
+        variant, Product A2. Nevertheless, it accepts any instance of
+        AbstractProductA as an argument.
+        """
+        result = collaborator.useful_function_a()
+        return f"The result of the C2 collaborating with the ({result})"
 
 
 def client_code(factory: AbstractFactory) -> None:
@@ -142,6 +214,10 @@ def client_code(factory: AbstractFactory) -> None:
 
     print(f"{product_b.useful_function_b()}")
     print(f"{product_b.another_useful_function_b(product_a)}", end="")
+
+    product_c = factory.create_porduct_c()
+    print(f"{product_c.another_useful_function_c(product_a)}", end="")
+
 
 
 if __name__ == "__main__":
