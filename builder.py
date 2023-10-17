@@ -9,7 +9,8 @@ class Builder(ABC):
     the Product objects.
     """
 
-    @property
+    #El decorador property es para no poner los getter y setter
+    @property 
     @abstractmethod
     def product(self) -> None:
         pass
