@@ -1,6 +1,6 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from auxiliar import hipotenusa
+from ejercicios.auxiliar import hipotenusa
 
 #Definimos la clase abstracta creador
 class Creator(ABC):
